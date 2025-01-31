@@ -1,21 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+.light {
+  --bright-blue: hsl(220, 98%, 61%);
+  --check-background: linear-gradient(
+    135deg,
+    hsl(192, 100%, 67%),
+    hsl(280, 87%, 65%)
+  );
+  --body-background: hsl(0, 0%, 98%);
+  --primary-background: white;
+  --secondary-background: hsl(236, 33%, 92%);
+  --background-hover: hsl(0, 0%, 95%);
+  --header-color: hsl(0, 0%, 98%);
+  --primary-text: hsl(235, 19%, 35%);
+  --secondary-text: hsl(236, 9%, 61%);
+  --tertiary-text: hsl(233, 11%, 84%);
+  --outline-primary: hsl(233, 11%, 84%);
+  --outline-secondary: hsl(235, 19%, 35%);
+  --divider: hsl(236, 33%, 92%);
+  font-size: 16px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.dark {
+  --body-background: hsl(235, 21%, 11%);
+  --primary-background: hsl(235, 24%, 19%);
+  --secondary-background: hsl(235, 24%, 19%);
+  --background-hover: hsl(237, 14%, 26%);
+  --primary-text: hsl(236, 33%, 92%);
+  --secondary-text: hsl(234, 39%, 85%);
+  --tertiary-text: hsl(234, 11%, 52%);
+  --outline-primary: hsl(233, 14%, 35%);
+  --outline-secondary: hsl(220, 98%, 61%);
+  --divider: hsl(233, 14%, 35%);
 }
