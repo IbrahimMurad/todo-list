@@ -1,5 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
+import CheckIcon from "@/app/images/icon-check.svg";
+import Image from "next/image";
 
 const StyledCheckCircle = styled.div<{ $checked?: boolean }>`
   min-width: 1.5rem;
@@ -10,6 +12,9 @@ const StyledCheckCircle = styled.div<{ $checked?: boolean }>`
     $checked ? "none" : "2px solid var(--outline-primary)"};
   border-radius: 50%;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   ${(props) =>
     props.$checked &&
@@ -30,30 +35,24 @@ const StyledCheckCircle = styled.div<{ $checked?: boolean }>`
           var(--check-background) border-box;
       `}
   }
-
-  &&::before {
-    ${(props) =>
-      props.$checked &&
-      css`
-        content: "";
-        position: absolute;
-        top: 0.32rem;
-        left: 0.3rem;
-        width: 1rem;
-        height: 1rem;
-        background-color: transparent;
-        background-image: url("/_next/static/media/icon-check.5b02c047.svg");
-        background-size: contain;
-        background-repeat: no-repeat;
-        border-radius: 50%;
-      `}
-  }
 `;
 
 export default function CheckCircle({
   completed,
+  onClick,
 }: {
   completed: boolean;
+  onClick?: () => void;
 }): React.ReactElement {
-  return <StyledCheckCircle $checked={completed}></StyledCheckCircle>;
+  return (
+    <StyledCheckCircle $checked={completed} onClick={onClick}>
+      <Image
+        src={CheckIcon}
+        alt="Check Icon"
+        width="16"
+        height="16"
+        className={`${!completed && "hidden"}`}
+      />
+    </StyledCheckCircle>
+  );
 }

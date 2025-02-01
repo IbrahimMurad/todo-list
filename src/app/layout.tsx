@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "@/app/providers";
 import Background from "@/app/components/Background";
 import Header from "@/app/components/Header";
+import StyledComponentsRegistry from "./registry";
 
 const JosefinSans = Josefin_Sans({
   variable: "--font-josefin-sans",
@@ -21,20 +22,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning={true} className="antialiased">
       <body
         className={`${JosefinSans.className} antialiased min-h-screen flex justify-center mt-12 dark:bg-bodyBackground`}
       >
-        <Providers>
-          <Background />
-          <main className="w-full min-w-[22rem] max-w-[50rem] flex flex-col items-center gap-12 p-8">
-            <Header />
-            {children}
-            <footer className="static bottom-20 mt-24">
-              <p>Drag and drop to reorder list</p>
-            </footer>
-          </main>
-        </Providers>
+        <StyledComponentsRegistry>
+          <Providers>
+            <Background />
+            <main className="w-full min-w-[22rem] max-w-[50rem] flex flex-col items-center gap-12 p-8">
+              <Header />
+              {children}
+              <footer className="static bottom-20 mt-24">
+                <p>Drag and drop to reorder list</p>
+              </footer>
+            </main>
+          </Providers>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );
