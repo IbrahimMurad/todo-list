@@ -104,7 +104,7 @@ export default function TodoItem({
           todo.completed ? "line-through text-secondaryText" : ""
         }`}
       >
-        {todo.text} {todo.order}
+        {todo.text}
       </p>
       <button className="ml-auto" onClick={() => onDelete(todo.id)}>
         <BiX className="text-3xl text-secondaryText" />
