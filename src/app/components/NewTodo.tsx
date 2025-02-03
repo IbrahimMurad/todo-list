@@ -4,7 +4,6 @@ import { BiPlus } from "react-icons/bi";
 import React, { useState, FormEvent } from "react";
 import CheckCircle from "./CheckCircle";
 import styled, { css } from "styled-components";
-import { getData, setData } from "@/app/utils/data";
 import { Todo } from "@/app/types/types";
 
 const StyledForm = styled.form`
@@ -63,8 +62,10 @@ const StyledButton = styled.button<{ $active: boolean }>`
 `;
 
 export default function NewTodo({
+  allTodos,
   setAllTodos,
 }: {
+  allTodos: Todo[];
   setAllTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 }): React.ReactElement {
   const [newTodo, setNewTodo] = useState<string>("");
@@ -84,17 +85,15 @@ export default function NewTodo({
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (newTodo) {
-      const data = getData();
       const newTodoItem = {
         id: crypto.randomUUID(),
-        order: data.length + 1,
         text: newTodo,
         completed: false,
+        order: allTodos.length,
       };
-      setData([...data, newTodoItem]);
       setNewTodo("");
       setActive(false);
-      setAllTodos([...data, newTodoItem]);
+      setAllTodos([...allTodos, newTodoItem]);
     }
   };
 

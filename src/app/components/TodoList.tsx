@@ -1,19 +1,50 @@
 "use client";
 
 import React from "react";
-import CheckCircle from "@/app/components/CheckCircle";
 import { Todo } from "@/app/types/types";
-import { BiX } from "react-icons/bi";
+import TodoItem from "@/app/components/TodoItem";
 
 export default function TodoList({
   todos,
-  onToggleComplete,
-  onDelete,
+  allTodos,
+  setAllTodos,
 }: {
   todos: Array<Todo>;
-  onToggleComplete: (id: string) => void;
-  onDelete: (id: string) => void;
+  allTodos: Array<Todo>;
+  setAllTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 }) {
+  const handleToggleComplete = (id: string) => {
+    const updatedTodos = allTodos.map((todo) => {
+      if (todo.id === id) {
+        return { ...todo, completed: !todo.completed };
+      }
+      return todo;
+    });
+    setAllTodos(updatedTodos);
+  };
+
+  const handleDelete = (id: string) => {
+    const updatedTodos = allTodos.filter((todo) => todo.id !== id);
+    setAllTodos(updatedTodos);
+  }; //
+
+  const updateOrder = () => {
+    // update the order of the todos based on the order in the dataset of the todo elements
+    const todoElements = Array.from(
+      document.querySelectorAll("[data-type='todo']")
+    );
+    const updatedTodos = [...allTodos];
+    todoElements.forEach((el) => {
+      const id = el.getAttribute("data-id");
+      updatedTodos.forEach((todo) => {
+        if (todo.id === id) {
+          todo.order = Number(el.getAttribute("data-order"));
+        }
+      });
+    });
+    setAllTodos(updatedTodos);
+  };
+
   // Only show empty state when we have confirmed there are no todos
   if (todos.length === 0) {
     return (
@@ -26,26 +57,13 @@ export default function TodoList({
   return (
     <ul className="w-full flex flex-col rounded-lg shadow-lg overflow-hidden">
       {todos.map((todo) => (
-        <li
+        <TodoItem
           key={todo.id}
-          className="w-full h-16 bg-primaryBackground flex justify-start items-center px-4 gap-4 border-b border-outlinePrimary"
-        >
-          <CheckCircle
-            completed={todo.completed}
-            onClick={() => onToggleComplete(todo.id)}
-          />
-          <p
-            onClick={() => onToggleComplete(todo.id)}
-            className={`cursor-pointer ${
-              todo.completed ? "line-through text-secondaryText" : ""
-            }`}
-          >
-            {todo.text}
-          </p>
-          <button className="ml-auto" onClick={() => onDelete(todo.id)}>
-            <BiX className="text-3xl text-secondaryText" />
-          </button>
-        </li>
+          todo={todo}
+          onToggleComplete={handleToggleComplete}
+          onDelete={handleDelete}
+          newOrder={updateOrder}
+        />
       ))}
     </ul>
   );

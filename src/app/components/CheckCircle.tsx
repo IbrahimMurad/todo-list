@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import CheckIcon from "@/app/images/icon-check.svg";
 import Image from "next/image";
 
-const StyledCheckCircle = styled.div<{ $checked?: boolean }>`
+const StyledCheckCircle = styled.button<{ $checked?: boolean }>`
   min-width: 1.5rem;
   min-height: 1.5rem;
   display: block;

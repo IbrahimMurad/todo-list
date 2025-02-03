@@ -7,27 +7,32 @@ import { Todo } from "@/app/types/types";
 import TodoList from "./components/TodoList";
 import { getData, setData } from "@/app/utils/data";
 import TodoSkeleton from "./components/TodoSkeleton";
+import { reOrderTodos } from "@/app/utils/utils";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
-  const [set, setSet] = useState<Array<Todo>>([]);
+
+  // allTodos is the master list of todos, set is the list that is displayed (filter is considered)
   const [allTodos, setAllTodos] = useState<Array<Todo>>([]);
+  const [set, setSet] = useState<Array<Todo>>([]);
   const [itemsLeft, setItemsLeft] = useState<number>(allTodos.length);
 
+  // Load data from local storage on first render and set it to allTodos
   useEffect(() => {
     try {
       const storedData = getData();
       setAllTodos(storedData);
-      setItemsLeft(storedData.filter((todo) => !todo.completed).length);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  }, []); // Run once on mount
+  }, []);
 
+  // Update the set of todos when the filter or allTodos change
   useEffect(() => {
+    // Apply filter to todos
     const applyFilter = (todos: Array<Todo>) => {
       if (filter === "all") return todos;
       if (filter === "active") return todos.filter((todo) => !todo.completed);
@@ -35,45 +40,30 @@ export default function Home() {
       return todos;
     };
 
-    setSet(applyFilter(allTodos));
+    const filteredTodos = applyFilter(allTodos).sort(
+      (a, b) => a.order - b.order
+    );
+    setSet([...filteredTodos]);
     setItemsLeft(allTodos.filter((todo) => !todo.completed).length);
+
+    // Update local storage with the new set of todos whenever allTodos changes
+    setData(reOrderTodos(allTodos));
   }, [filter, allTodos]); // Run when filter or todos change
-
-  const handleToggleComplete = (id: string) => {
-    const updatedTodos = allTodos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, completed: !todo.completed };
-      }
-      return todo;
-    });
-    setAllTodos(updatedTodos);
-    setItemsLeft(updatedTodos.filter((todo) => !todo.completed).length);
-  };
-
-  const handleDelete = (id: string) => {
-    const updatedTodos = allTodos.filter((todo) => todo.id !== id);
-    setData(updatedTodos);
-    setAllTodos(updatedTodos);
-    setItemsLeft(updatedTodos.filter((todo) => !todo.completed).length);
-  };
 
   const clearCompleted = () => {
     const onlyActiveTodos = allTodos.filter((todo) => !todo.completed);
-    setData(onlyActiveTodos);
-    setAllTodos(onlyActiveTodos);
+    const updatedTodos = reOrderTodos(onlyActiveTodos);
+    setData(updatedTodos);
+    setAllTodos(updatedTodos);
   };
 
   return (
     <section className="w-full flex flex-col items-center justify-between gap-8">
-      <NewTodo setAllTodos={setAllTodos} />
+      <NewTodo allTodos={allTodos} setAllTodos={setAllTodos} />
       {loading ? (
         <TodoSkeleton />
       ) : (
-        <TodoList
-          todos={set}
-          onToggleComplete={handleToggleComplete}
-          onDelete={handleDelete}
-        />
+        <TodoList todos={set} allTodos={allTodos} setAllTodos={setAllTodos} />
       )}
       <ListFooter
         activeFilter={filter}
