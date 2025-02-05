@@ -8,8 +8,11 @@ import TodoList from "@/app/components/TodoList";
 import TodoSkeleton from "@/app/components/TodoSkeleton";
 import { applyFilter } from "@/app/services";
 import { useTodos } from "@/app/context/todos";
+import { setLocalData } from "@/app/lib/localData";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { status } = useSession();
   const { todos, loading } = useTodos();
 
   const [filter, setFilter] = useState<"all" | "active" | "completed">("all");
@@ -20,6 +23,7 @@ export default function Home() {
       (a, b) => a.sort_order - b.sort_order
     );
     setTodoSet([...filteredTodos]);
+    if (status === "unauthenticated") setLocalData(todos);
   }, [filter, todos]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

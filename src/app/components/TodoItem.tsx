@@ -8,7 +8,6 @@ import { useTodos } from "@/app/context/todos";
 import { useSession } from "next-auth/react";
 import { updateTodoStatus, removeTodo } from "@/app/lib/dbData";
 import { reOrderTodos } from "@/app/services";
-import { setLocalData } from "@/app/lib/localData";
 import { updateTodoOrder } from "@/app/lib/dbData";
 
 export default function TodoItem({ todo }: { todo: Todo }) {
@@ -81,7 +80,6 @@ export default function TodoItem({ todo }: { todo: Todo }) {
     const orderdTodos = reOrderTodos(todos, parentElement);
 
     if (status === "unauthenticated") {
-      setLocalData(orderdTodos);
       setTodos(orderdTodos);
     }
 
