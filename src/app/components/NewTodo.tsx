@@ -4,7 +4,9 @@ import { BiPlus } from "react-icons/bi";
 import React, { useState, FormEvent } from "react";
 import CheckCircle from "./CheckCircle";
 import styled, { css } from "styled-components";
-import { Todo } from "@/app/types/types";
+import { useTodos } from "@/app/context/todos";
+import { useSession } from "next-auth/react";
+import { addTodo } from "@/app/lib/dbData";
 
 const StyledForm = styled.form`
   width: 100%;
@@ -25,7 +27,6 @@ const StyledInput = styled.input`
   height: 100%;
   width: 100%;
   border-radius: 0.5rem;
-  flex-grow: 1;
   border: none;
   font-size: 1.5rem;
   background-color: inherit;
@@ -61,13 +62,9 @@ const StyledButton = styled.button<{ $active: boolean }>`
     `}
 `;
 
-export default function NewTodo({
-  allTodos,
-  setAllTodos,
-}: {
-  allTodos: Todo[];
-  setAllTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-}): React.ReactElement {
+export default function NewTodo(): React.ReactElement {
+  const { status } = useSession();
+  const { todos, setTodos } = useTodos();
   const [newTodo, setNewTodo] = useState<string>("");
   const [active, setActive] = useState<boolean>(false);
 
@@ -89,11 +86,22 @@ export default function NewTodo({
         id: crypto.randomUUID(),
         text: newTodo,
         completed: false,
-        order: allTodos.length,
+        sort_order: todos.length,
       };
+      if (status === "loading") {
+        alert("Please wait until the list is loaded.");
+        return;
+      }
+      if (status === "authenticated") {
+        addTodo(newTodoItem).then(() => {
+          setTodos([...todos, newTodoItem]);
+        });
+      }
+      if (status === "unauthenticated") {
+        setTodos([...todos, newTodoItem]);
+      }
       setNewTodo("");
       setActive(false);
-      setAllTodos([...allTodos, newTodoItem]);
     }
   };
 

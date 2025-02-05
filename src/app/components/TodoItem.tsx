@@ -4,27 +4,99 @@ import React, { useState } from "react";
 import { Todo } from "@/app/types/types";
 import CheckCircle from "@/app/components/CheckCircle";
 import { BiX } from "react-icons/bi";
+import { useTodos } from "@/app/context/todos";
+import { useSession } from "next-auth/react";
+import { updateTodoStatus, removeTodo } from "@/app/lib/dbData";
+import { reOrderTodos } from "@/app/services";
+import { setLocalData } from "@/app/lib/localData";
+import { updateTodoOrder } from "@/app/lib/dbData";
 
-export default function TodoItem({
-  todo,
-  onToggleComplete,
-  onDelete,
-  newOrder,
-}: {
-  todo: Todo;
-  onToggleComplete: (id: string) => void;
-  onDelete: (id: string) => void;
-  newOrder: () => void;
-}) {
+export default function TodoItem({ todo }: { todo: Todo }) {
+  const { status } = useSession();
+  const { todos, setTodos } = useTodos();
+
   const [dragging, setDragging] = useState(false);
+
+  const handleToggleComplete = (id: string) => {
+    if (status === "unauthenticated") {
+      const updatedTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, completed: !todo.completed };
+        }
+        return todo;
+      });
+      setTodos(updatedTodos);
+      return;
+    }
+    if (status === "authenticated") {
+      updateTodoStatus(id, !todo.completed).catch((error) => {
+        alert(
+          "An error occurred while updating the todo.\n Please refresh the page and try again."
+        );
+        console.error(error);
+      });
+      const updatedTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, completed: !todo.completed };
+        }
+        return todo;
+      });
+      setTodos(updatedTodos);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (status === "loading") {
+      alert("Please wait until the list is fully loaded.");
+      return;
+    }
+
+    if (status === "unauthenticated") {
+      const updatedTodos = todos.filter((todo) => todo.id !== id);
+      setTodos(updatedTodos);
+      return;
+    }
+
+    if (status === "authenticated") {
+      removeTodo(id).then(() => {
+        const updatedTodos = todos.filter((todo) => todo.id !== id);
+        setTodos(updatedTodos);
+      });
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData("id", todo.id);
     setDragging(true);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (e: React.DragEvent) => {
     setDragging(false);
-    newOrder();
+    if (status === "loading") {
+      alert("Please wait until the list is fully loaded and try again.");
+      return;
+    }
+
+    const parentElement = e.currentTarget.parentElement as HTMLElement;
+    const orderdTodos = reOrderTodos(todos, parentElement);
+
+    if (status === "unauthenticated") {
+      setLocalData(orderdTodos);
+      setTodos(orderdTodos);
+    }
+
+    if (status === "authenticated") {
+      updateTodoOrder(orderdTodos)
+        .then(() => {
+          setTodos(orderdTodos);
+        })
+        .catch((error) => {
+          alert(
+            "An error occurred while reordering the todos.\n Please refresh the page and try again."
+          );
+          console.error(error);
+        });
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -78,7 +150,7 @@ export default function TodoItem({
       key={todo.id}
       data-type="todo"
       data-id={todo.id}
-      data-order={todo.order}
+      data-order={todo.sort_order}
       data-dragging={dragging}
       className={`w-full h-16 bg-primaryBackground
       flex justify-start items-center px-4 gap-4 border-b
@@ -96,17 +168,17 @@ export default function TodoItem({
     >
       <CheckCircle
         completed={todo.completed}
-        onClick={() => onToggleComplete(todo.id)}
+        onClick={() => handleToggleComplete(todo.id)}
       />
       <p
-        onClick={() => onToggleComplete(todo.id)}
+        onClick={() => handleToggleComplete(todo.id)}
         className={`cursor-pointer ${
           todo.completed ? "line-through text-secondaryText" : ""
         }`}
       >
         {todo.text}
       </p>
-      <button className="ml-auto" onClick={() => onDelete(todo.id)}>
+      <button onClick={() => handleDelete(todo.id)} className="ms-auto">
         <BiX className="text-3xl text-secondaryText" />
       </button>
     </li>

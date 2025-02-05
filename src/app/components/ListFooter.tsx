@@ -1,19 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ActiveFilter } from "@/app/types/types";
+import { useTodos } from "@/app/context/todos";
+import { removeCompleted, updateTodoOrder } from "@/app/lib/dbData";
+import { setLocalData } from "@/app/lib/localData";
+import { reOrderTodos } from "@/app/services";
+import { useSession } from "next-auth/react";
 
 export default function ListFooter({
   activeFilter,
   setFilter,
-  itemsLeft,
-  onClearCompleted,
 }: {
   activeFilter: ActiveFilter;
   setFilter: React.Dispatch<
     React.SetStateAction<"all" | "active" | "completed">
   >;
-  itemsLeft: number;
-  onClearCompleted: () => void;
 }): React.ReactElement {
+  const { status } = useSession();
+  const { todos, setTodos } = useTodos();
+  const [itemsLeft, setItemsLeft] = useState<number>(0);
+  const [clearing, setClearing] = useState<boolean>(false);
+
+  useEffect(() => {
+    const itemsLeft = todos.filter((todo) => !todo.completed).length;
+    setItemsLeft(itemsLeft);
+  }, [todos]);
+
+  const clearCompleted = () => {
+    setClearing(true);
+    if (status === "authenticated") {
+      removeCompleted()
+        .then(() => {
+          const onlyActiveTodos = todos.filter((todo) => !todo.completed);
+          const updatedTodos = reOrderTodos(onlyActiveTodos);
+          setTodos(updatedTodos);
+          updateTodoOrder(updatedTodos);
+          setClearing(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("An error occurred. Please try again.");
+          setClearing(false);
+        });
+      return;
+    }
+    const onlyActiveTodos = todos.filter((todo) => !todo.completed);
+    const updatedTodos = reOrderTodos(onlyActiveTodos);
+    setLocalData(updatedTodos);
+    setTodos(updatedTodos);
+    setClearing(false);
+  };
+
   return (
     <div className="flex justify-between items-center h-16 w-full relative gap-4 p-6 text-tertiaryText font-bold shadow-lg bg-primaryBackground rounded-lg">
       <small className="">{itemsLeft} items left</small>
@@ -53,12 +89,16 @@ export default function ListFooter({
           </button>
         </li>
       </ul>
-      <button
-        className="text-secondaryText cursor-pointer hover:text-primaryText"
-        onClick={onClearCompleted}
-      >
-        Clear completed
-      </button>
+      {clearing ? (
+        <div className="animate-pulse">Clearing...</div>
+      ) : (
+        <button
+          className="cursor-pointer text-xl sm:text-base"
+          onClick={clearCompleted}
+        >
+          Clear Completed
+        </button>
+      )}
     </div>
   );
 }

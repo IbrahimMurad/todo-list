@@ -4,5 +4,10 @@ export interface Todo {
   id: string;
   text: string;
   completed: boolean;
-  order: number;
+  sort_order: number;
 }
+
+export type User = {
+  id: number;
+  email: string;
+};
