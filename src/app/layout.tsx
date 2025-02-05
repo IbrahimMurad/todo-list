@@ -5,7 +5,6 @@ import { Providers, AuthProvider } from "@/app/providers";
 import Background from "@/app/components/Background";
 import Header from "@/app/components/Header";
 import StyledComponentsRegistry from "./registry";
-import Auth from "@/app/components/Auth";
 import { TodosProvider } from "@/app/context/todos";
 
 const JosefinSans = Josefin_Sans({
@@ -26,15 +25,14 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning={true} className="antialiased">
       <body
-        className={`${JosefinSans.className} antialiased min-h-screen flex justify-center mt-12 dark:bg-bodyBackground`}
+        className={`${JosefinSans.className} antialiased min-h-screen flex flex-col items-center dark:bg-bodyBackground`}
       >
         <StyledComponentsRegistry>
           <Providers>
             <AuthProvider>
               <Background />
-              <Auth />
-              <main className="w-full min-w-[22rem] max-w-[50rem] mt-4 flex flex-col items-center gap-12 p-8">
-                <Header />
+              <Header />
+              <main className="mt-10 w-full min-w-[22rem] max-w-[50rem] flex flex-col items-center justify-center gap-12 p-8">
                 <TodosProvider>{children}</TodosProvider>
                 <footer className="static bottom-20 mt-24">
                   <p>Drag and drop to reorder list</p>

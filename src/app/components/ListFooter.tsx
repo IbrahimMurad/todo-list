@@ -53,10 +53,10 @@ export default function ListFooter({
   return (
     <div className="flex justify-between items-center h-16 w-full relative gap-4 p-6 text-tertiaryText font-bold shadow-lg bg-primaryBackground rounded-lg">
       <small className="">{itemsLeft} items left</small>
-      <ul className="flex align-center p-4 h-16 sm:h-auto gap-8 font-extrabold justify-center absolute sm:relative -bottom-24 left-0 sm:bottom-0 sm:left-0 w-full sm:w-fit shadow-lg bg-primaryBackground rounded-lg sm:bg-inherit sm:shadow-none sm:rounded-none">
+      <ul className="text-lg flex align-center p-4 h-16 sm:h-auto gap-8 font-extrabold justify-center absolute sm:relative -bottom-24 left-0 sm:bottom-0 sm:left-0 w-full sm:w-fit shadow-lg bg-primaryBackground rounded-lg sm:bg-inherit sm:shadow-none sm:rounded-none">
         <li>
           <button
-            className={`cursor-pointer text-xl sm:text-base ${
+            className={`cursor-pointer ${
               activeFilter === "all" ? "text-brightBlue" : "text-secondaryText"
             }`}
             onClick={() => setFilter("all")}
@@ -66,7 +66,7 @@ export default function ListFooter({
         </li>
         <li>
           <button
-            className={`cursor-pointer text-xl sm:text-base ${
+            className={`cursor-pointer ${
               activeFilter === "active"
                 ? "text-brightBlue"
                 : "text-secondaryText"
@@ -78,7 +78,7 @@ export default function ListFooter({
         </li>
         <li>
           <button
-            className={`cursor-pointer text-xl sm:text-base ${
+            className={`cursor-pointer ${
               activeFilter === "completed"
                 ? "text-brightBlue"
                 : "text-secondaryText"
@@ -92,10 +92,7 @@ export default function ListFooter({
       {clearing ? (
         <div className="animate-pulse">Clearing...</div>
       ) : (
-        <button
-          className="cursor-pointer text-xl sm:text-base"
-          onClick={clearCompleted}
-        >
+        <button className="cursor-pointer text-lg" onClick={clearCompleted}>
           Clear Completed
         </button>
       )}
