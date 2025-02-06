@@ -9,7 +9,7 @@ export default function TodoList({ todoSet }: { todoSet: Array<Todo> }) {
   if (todoSet.length === 0) {
     return (
       <p className="w-full h-16 bg-primaryBackground flex justify-center shadow-lg rounded-lg items-center">
-        No todos yet!
+        Empty list!
       </p>
     );
   }
