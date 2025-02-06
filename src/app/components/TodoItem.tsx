@@ -151,8 +151,10 @@ export default function TodoItem({ todo }: { todo: Todo }) {
       data-order={todo.sort_order}
       data-dragging={dragging}
       className={`w-full h-16 bg-primaryBackground
-      flex justify-start items-center px-4 gap-4 border-b
-      border-outlinePrimary
+      flex justify-start items-center px-4 gap-4
+      ${
+        todo.sort_order === 0 ? "border-none" : "border-t border-outlinePrimary"
+      }
       ${
         dragging
           ? "shadow-lg rounded-lg bg-gray-300/50 dark:bg-gray-500/50 transform translate-x-1 transition-transform"

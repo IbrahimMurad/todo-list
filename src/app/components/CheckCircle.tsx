@@ -52,6 +52,7 @@ export default function CheckCircle({
         width="16"
         height="16"
         className={`${!completed && "hidden"}`}
+        style={{ width: "1rem", height: "1rem" }}
       />
     </StyledCheckCircle>
   );

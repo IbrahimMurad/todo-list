@@ -27,7 +27,7 @@ export default function Home() {
   }, [filter, todos]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className="w-full flex flex-col items-center justify-between gap-8">
+    <section className="w-full flex flex-col items-center justify-between gap-8 p-4 rounded-lg bg-gray-100/80 dark:bg-gray-700/90">
       <NewTodo />
       {loading ? <TodoSkeleton /> : <TodoList todoSet={todoSet} />}
       <ListFooter activeFilter={filter} setFilter={setFilter} />
